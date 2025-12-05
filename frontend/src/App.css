@@ -1,0 +1,87 @@
+/* Main App Styling - Professional Hedge Fund Aesthetic */
+
+* {
+  box-sizing: border-box;
+}
+
+.app {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+  color: #e2e8f0;
+}
+
+.app-header {
+  background: rgba(15, 23, 42, 0.95);
+  padding: 2rem;
+  text-align: center;
+  border-bottom: 2px solid #334155;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  margin: 0.5rem 0 0;
+  font-size: 1.1rem;
+  color: #94a3b8;
+  font-weight: 300;
+}
+
+.app-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Banner Styles */
+.error-banner {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid #ef4444;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: #fca5a5;
+}
+
+.loading-banner {
+  background: rgba(59, 130, 246, 0.1);
+  border: 1px solid #3b82f6;
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  color: #93c5fd;
+  text-align: center;
+  font-weight: 500;
+}
+
+.app-footer {
+  text-align: center;
+  padding: 2rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  border-top: 1px solid #334155;
+  margin-top: 4rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-header h1 {
+    font-size: 1.8rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .app-container {
+    padding: 1rem;
+  }
+}
