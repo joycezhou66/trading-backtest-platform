@@ -76,8 +76,29 @@ def health_check():
     return jsonify({
         'status': 'healthy',
         'service': 'Trading Backtest API',
-        'version': '1.0.0'
+        'version': '1.0.1',
+        'has_session': hasattr(data_handler, 'session')
     }), 200
+
+@app.route('/api/test-yfinance', methods=['GET'])
+def test_yfinance():
+    """Debug endpoint to test yfinance directly"""
+    import yfinance as yf
+    try:
+        ticker = yf.Ticker("AAPL", session=data_handler.session)
+        data = ticker.history(start="2024-01-01", end="2024-01-10")
+        return jsonify({
+            'success': True,
+            'rows': len(data),
+            'columns': list(data.columns),
+            'first_date': str(data.index[0]) if len(data) > 0 else None
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'error': str(e),
+            'type': type(e).__name__
+        }), 500
 
 
 @app.route('/api/strategies', methods=['GET'])

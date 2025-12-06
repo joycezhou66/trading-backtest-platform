@@ -212,6 +212,8 @@ class DataHandler:
         except Exception as e:
             error_msg = f"Download failed for {ticker}: {str(e)}"
             logger.error(error_msg)
+            logger.error(f"Exception type: {type(e).__name__}")
+            logger.error(f"Full traceback: {e}", exc_info=True)
             raise ValueError(error_msg)
 
     def get_data(
