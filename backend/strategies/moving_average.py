@@ -147,7 +147,26 @@ class MovingAverageStrategy(BaseStrategy):
         # Clean up: first signal is NaN (no previous day to compare)
         signals['signal'].iloc[0] = 0.0
 
-        return signals[['signal']]
+        return signals[['signal', 'position_raw']]
+
+    def calculate_positions(self, signals: pd.DataFrame) -> pd.DataFrame:
+        """
+        Convert MA crossover signals to long-only positions.
+
+        WHY OVERRIDE: Base class forward-fills signals which can create shorts.
+        MA strategy is long-only: fast>slow = long (1), fast<slow = flat (0).
+        """
+        positions = pd.DataFrame(index=signals.index)
+
+        # Use position_raw (already calculated in generate_signals)
+        # position_raw = 1 when fast_ma > slow_ma, 0 otherwise
+        positions['position'] = signals['position_raw']
+
+        # Shift by 1 to avoid look-ahead bias
+        # WHY: Can't act on today's MA calculation until tomorrow
+        positions['position'] = positions['position'].shift(1).fillna(0)
+
+        return positions
 
     def get_parameter_info(self) -> Dict[str, Any]:
         """

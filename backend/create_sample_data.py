@@ -20,7 +20,7 @@ END_DATE = '2024-12-01'
 
 def generate_realistic_stock_data(ticker: str, start_price: float, volatility: float, trend: float):
     """
-    Generate realistic stock price data using geometric Brownian motion.
+    Generate realistic stock price data with clear trends and reversals.
 
     Args:
         ticker: Stock symbol
@@ -32,10 +32,21 @@ def generate_realistic_stock_data(ticker: str, start_price: float, volatility: f
     dates = pd.date_range(start=START_DATE, end=END_DATE, freq='B')  # Business days only
     n_days = len(dates)
 
-    # Generate random returns using geometric Brownian motion
-    # WHY: This is how actual stock prices behave (random walk with drift)
-    daily_returns = np.random.normal(trend/252, volatility, n_days)
-    price_series = start_price * np.exp(np.cumsum(daily_returns))
+    # Generate price series with alternating trends for realistic crossovers
+    # WHY: Real markets have bull/bear cycles, creating natural MA crossovers
+    np.random.seed(hash(ticker) % 2**32)  # Reproducible but different per ticker
+
+    # Create trend segments (bull/bear markets)
+    segment_length = n_days // 6  # ~6 major trend changes over the period
+    price_series = np.zeros(n_days)
+    price_series[0] = start_price
+
+    for i in range(1, n_days):
+        segment = i // segment_length
+        # Alternate between uptrend and downtrend
+        current_trend = trend if segment % 2 == 0 else -trend * 0.3
+        daily_return = np.random.normal(current_trend/252, volatility)
+        price_series[i] = price_series[i-1] * (1 + daily_return)
 
     # Generate OHLCV data
     # WHY: Realistic intraday movements for backtesting
