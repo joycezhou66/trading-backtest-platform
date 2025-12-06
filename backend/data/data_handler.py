@@ -131,13 +131,15 @@ class DataHandler:
         logger.info(f"Downloading {ticker} from {start_date} to {end_date}")
 
         try:
+            # Create ticker object with custom session for better reliability
+            # WHY: Some servers block default user agents
+            ticker_obj = yf.Ticker(ticker)
+
             # Download data with auto_adjust=True to get split/dividend adjusted prices
             # WHY: Unadjusted prices give false signals at split events
-            data = yf.download(
-                ticker,
+            data = ticker_obj.history(
                 start=start_date,
                 end=end_date,
-                progress=False,
                 auto_adjust=True  # Critical for accurate backtests
             )
 
