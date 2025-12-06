@@ -50,7 +50,15 @@ CORS(app)
 
 # Initialize data handler and backtester
 # WHY GLOBAL: These are stateless, safe to share across requests
-data_handler = DataHandler(cache_dir='cache')
+# Use absolute path for static_data_dir to ensure it works in deployed environment
+import os
+static_data_path = os.path.join(os.path.dirname(__file__), 'static_data')
+logger.info(f"Static data path: {static_data_path}")
+logger.info(f"Static data exists: {os.path.exists(static_data_path)}")
+if os.path.exists(static_data_path):
+    logger.info(f"Static data files: {os.listdir(static_data_path)}")
+
+data_handler = DataHandler(cache_dir='cache', static_data_dir=static_data_path)
 backtester = Backtester(initial_capital=100000.0)
 
 # Strategy registry
