@@ -17,6 +17,9 @@ from datetime import datetime, timedelta
 from typing import Optional
 import pandas as pd
 import yfinance as yf
+from requests import Session
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 # Configure logging to track cache hits/misses
 logging.basicConfig(level=logging.INFO)
@@ -48,6 +51,44 @@ class DataHandler:
         """
         self.cache_dir = cache_dir
         os.makedirs(cache_dir, exist_ok=True)
+
+        # Create robust session with retry logic for production environments
+        # WHY: Network issues are common in cloud environments, retries improve reliability
+        self.session = self._create_session()
+
+    def _create_session(self) -> Session:
+        """
+        Create a requests session with retry logic and proper headers.
+
+        WHY: Yahoo Finance sometimes blocks requests without proper headers.
+        Retry logic handles transient network failures in cloud environments.
+        """
+        session = Session()
+
+        # Configure retry strategy
+        # WHY: Exponential backoff prevents overwhelming the server during failures
+        retry_strategy = Retry(
+            total=3,
+            backoff_factor=1,
+            status_forcelist=[429, 500, 502, 503, 504],
+            allowed_methods=["GET", "POST"]
+        )
+
+        adapter = HTTPAdapter(max_retries=retry_strategy)
+        session.mount("http://", adapter)
+        session.mount("https://", adapter)
+
+        # Add headers to avoid being blocked
+        # WHY: Yahoo Finance may block requests with default user agents
+        session.headers.update({
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            'Accept-Language': 'en-US,en;q=0.5',
+            'Accept-Encoding': 'gzip, deflate',
+            'Connection': 'keep-alive',
+        })
+
+        return session
 
     def _get_cache_path(self, ticker: str, start_date: str, end_date: str) -> str:
         """
@@ -117,7 +158,7 @@ class DataHandler:
 
     def _download_data(self, ticker: str, start_date: str, end_date: str) -> pd.DataFrame:
         """
-        Download data from yfinance.
+        Download data from yfinance with robust error handling and retry logic.
 
         WHY YFINANCE: Free, reliable, and widely used. Provides adjusted close
         prices which account for splits/dividends (critical for accurate backtests).
@@ -132,16 +173,29 @@ class DataHandler:
 
         try:
             # Create ticker object with custom session for better reliability
-            # WHY: Some servers block default user agents
-            ticker_obj = yf.Ticker(ticker)
+            # WHY: Custom session with headers prevents being blocked by Yahoo Finance
+            ticker_obj = yf.Ticker(ticker, session=self.session)
 
             # Download data with auto_adjust=True to get split/dividend adjusted prices
             # WHY: Unadjusted prices give false signals at split events
             data = ticker_obj.history(
                 start=start_date,
                 end=end_date,
-                auto_adjust=True  # Critical for accurate backtests
+                auto_adjust=True,  # Critical for accurate backtests
+                timeout=30  # Prevent hanging requests
             )
+
+            if data.empty:
+                # Try alternative download method as fallback
+                logger.warning(f"First attempt failed for {ticker}, trying alternative method")
+                data = yf.download(
+                    ticker,
+                    start=start_date,
+                    end=end_date,
+                    progress=False,
+                    auto_adjust=True,
+                    session=self.session
+                )
 
             if data.empty:
                 raise ValueError(f"No data returned for {ticker}")
@@ -152,10 +206,13 @@ class DataHandler:
             if missing:
                 raise ValueError(f"Missing columns: {missing}")
 
+            logger.info(f"Successfully downloaded {len(data)} rows for {ticker}")
             return data
 
         except Exception as e:
-            raise ValueError(f"Download failed for {ticker}: {str(e)}")
+            error_msg = f"Download failed for {ticker}: {str(e)}"
+            logger.error(error_msg)
+            raise ValueError(error_msg)
 
     def get_data(
         self,
