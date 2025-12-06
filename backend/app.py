@@ -85,13 +85,24 @@ def test_yfinance():
     """Debug endpoint to test yfinance directly"""
     import yfinance as yf
     try:
+        # Try multiple methods
         ticker = yf.Ticker("AAPL", session=data_handler.session)
-        data = ticker.history(start="2024-01-01", end="2024-01-10")
+
+        # Method 1: period parameter
+        data1 = ticker.history(period="1mo")
+
+        # Method 2: start/end dates
+        data2 = ticker.history(start="2024-01-01", end="2024-01-10")
+
+        # Method 3: yf.download
+        data3 = yf.download("AAPL", start="2024-01-01", end="2024-01-10", progress=False)
+
         return jsonify({
             'success': True,
-            'rows': len(data),
-            'columns': list(data.columns),
-            'first_date': str(data.index[0]) if len(data) > 0 else None
+            'method1_period_rows': len(data1),
+            'method2_dates_rows': len(data2),
+            'method3_download_rows': len(data3),
+            'columns': list(data1.columns) if len(data1) > 0 else list(data2.columns) if len(data2) > 0 else list(data3.columns) if len(data3) > 0 else []
         }), 200
     except Exception as e:
         return jsonify({
