@@ -39,17 +39,20 @@ class DataHandler:
     Reduces latency and external dependencies.
     """
 
-    def __init__(self, cache_dir: str = "cache"):
+    def __init__(self, cache_dir: str = "cache", static_data_dir: str = "static_data"):
         """
         Initialize data handler.
 
         Args:
             cache_dir: Directory to store cached data files
+            static_data_dir: Directory containing pre-loaded static data files
 
         WHY: Configurable cache directory allows testing with temp directories
-        and production use with persistent storage.
+        and production use with persistent storage. Static data ensures demos
+        work even when Yahoo Finance is unavailable.
         """
         self.cache_dir = cache_dir
+        self.static_data_dir = static_data_dir
         os.makedirs(cache_dir, exist_ok=True)
 
         # Create robust session with retry logic for production environments
@@ -89,6 +92,30 @@ class DataHandler:
         })
 
         return session
+
+    def _load_static_data(self, ticker: str, start_date: str, end_date: str) -> Optional[pd.DataFrame]:
+        """
+        Load data from static files if available.
+
+        WHY: Static data files ensure demos work even when Yahoo Finance API
+        is unavailable due to rate limiting or network issues. This is critical
+        for production reliability.
+        """
+        static_path = os.path.join(
+            self.static_data_dir,
+            f"{ticker}_{start_date}_{end_date}.csv"
+        )
+
+        if not os.path.exists(static_path):
+            return None
+
+        try:
+            data = pd.read_csv(static_path, index_col=0, parse_dates=True)
+            logger.info(f"Static data loaded: {ticker}")
+            return data
+        except Exception as e:
+            logger.error(f"Failed to load static data: {e}")
+            return None
 
     def _get_cache_path(self, ticker: str, start_date: str, end_date: str) -> str:
         """
@@ -227,7 +254,7 @@ class DataHandler:
         use_cache: bool = True
     ) -> pd.DataFrame:
         """
-        Get market data, using cache when possible.
+        Get market data with multiple fallback sources for reliability.
 
         Args:
             ticker: Stock ticker symbol (e.g., 'AAPL')
@@ -238,25 +265,31 @@ class DataHandler:
         Returns:
             DataFrame with OHLCV data and DatetimeIndex
 
-        WHY SEPARATE use_cache FLAG: Sometimes you want fresh data (e.g., live trading).
-        This flag allows bypassing cache when needed.
+        WHY MULTIPLE SOURCES: Production systems need fallbacks. If Yahoo Finance
+        is down or rate-limiting, we fall back to static data for demos.
 
         FLOW:
-        1. Try cache (if enabled)
-        2. Download if cache miss
-        3. Save to cache for future use
-        4. Return data
+        1. Try static data (pre-loaded, always works)
+        2. Try cache (if enabled)
+        3. Download if cache miss
+        4. Save to cache for future use
+        5. Return data
         """
+        # Try static data first (most reliable for demos)
+        static_data = self._load_static_data(ticker, start_date, end_date)
+        if static_data is not None:
+            return static_data
+
         cache_path = self._get_cache_path(ticker, start_date, end_date)
 
-        # Try cache first
+        # Try cache second
         if use_cache:
             cached_data = self._load_from_cache(cache_path)
             if cached_data is not None:
                 return cached_data
 
-        # Cache miss - download data
-        logger.info(f"Cache MISS: {ticker}")
+        # Last resort - download data (may fail due to rate limiting)
+        logger.info(f"Cache MISS: {ticker}, attempting download")
         data = self._download_data(ticker, start_date, end_date)
 
         # Save to cache for next time
