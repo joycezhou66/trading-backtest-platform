@@ -176,12 +176,11 @@ class DataHandler:
             # WHY: Custom session with headers prevents being blocked by Yahoo Finance
             ticker_obj = yf.Ticker(ticker, session=self.session)
 
-            # Download data with auto_adjust=True to get split/dividend adjusted prices
-            # WHY: Unadjusted prices give false signals at split events
+            # Download data - trying without auto_adjust first for compatibility
+            # WHY: auto_adjust behavior changed in newer yfinance versions
             data = ticker_obj.history(
                 start=start_date,
                 end=end_date,
-                auto_adjust=True,  # Critical for accurate backtests
                 timeout=30  # Prevent hanging requests
             )
 
@@ -193,18 +192,22 @@ class DataHandler:
                     start=start_date,
                     end=end_date,
                     progress=False,
-                    auto_adjust=True,
                     session=self.session
                 )
 
             if data.empty:
                 raise ValueError(f"No data returned for {ticker}")
 
+            # Use Adj Close for accurate backtesting (accounts for splits/dividends)
+            # WHY: Adj Close prevents false signals from corporate actions
+            if 'Adj Close' in data.columns:
+                data['Close'] = data['Adj Close']
+
             # Ensure we have the required columns
             required_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
             missing = set(required_cols) - set(data.columns)
             if missing:
-                raise ValueError(f"Missing columns: {missing}")
+                raise ValueError(f"Missing columns: {missing}, have: {list(data.columns)}")
 
             logger.info(f"Successfully downloaded {len(data)} rows for {ticker}")
             return data
