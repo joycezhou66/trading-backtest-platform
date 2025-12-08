@@ -176,7 +176,31 @@ class MeanReversionStrategy(BaseStrategy):
                 # Signal 0 means "close position" (handled in position calculation)
                 pass  # Keep as 0
 
-        return signals[['signal']]
+        # Create position indicator based on signals
+        signals['position_raw'] = 0.0
+        position = 0.0
+        for i in range(len(signals)):
+            if signals['signal'].iloc[i] == 1.0:
+                position = 1.0  # Enter long
+            elif signals['signal'].iloc[i] == -1.0:
+                position = 0.0  # Exit (mean reversion is long-only or flat)
+            signals.iloc[i, signals.columns.get_loc('position_raw')] = position
+
+        return signals[['signal', 'position_raw']]
+
+    def calculate_positions(self, signals: pd.DataFrame) -> pd.DataFrame:
+        """
+        Convert signals to positions for mean reversion strategy.
+
+        Override base class to handle mean reversion logic correctly.
+        """
+        positions = pd.DataFrame(index=signals.index)
+        positions['position'] = signals['position_raw']
+
+        # Shift by 1 to avoid look-ahead bias
+        positions['position'] = positions['position'].shift(1).fillna(0)
+
+        return positions
 
     def get_parameter_info(self) -> Dict[str, Any]:
         """Return strategy metadata for API documentation."""
