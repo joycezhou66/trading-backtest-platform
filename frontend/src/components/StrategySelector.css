@@ -115,7 +115,7 @@
   font-family: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
 }
 
-/* Run Button - Cohesive Purple */
+/* Run Button - Outlined Purple with Rounded Corners */
 .run-button {
   display: block;
   width: auto;
@@ -123,21 +123,22 @@
   max-width: 300px;
   margin: 1.5rem auto 0;
   padding: 0.875rem 3rem;
-  border: none;
-  border-radius: 4px;
-  background: #3C104D;
-  color: #ffffff;
+  border: 2px solid #3C104D;
+  border-radius: 24px;
+  background: #f8f9fa;
+  color: #3C104D;
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
   letter-spacing: 0.02em;
 }
 
 .run-button:hover:not(:disabled) {
-  background: #2a0b36;
+  background: #3C104D;
+  color: #ffffff;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(60, 16, 77, 0.3);
+  box-shadow: 0 4px 12px rgba(60, 16, 77, 0.2);
 }
 
 .run-button:disabled {
