@@ -22,10 +22,10 @@
 .app-header h1 {
   margin: 0;
   font-size: 2.25rem;
-  font-weight: 600;
+  font-weight: 400;
   color: #3C104D;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
-  letter-spacing: -0.03em;
+  font-family: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
