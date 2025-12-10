@@ -2,6 +2,10 @@
 
 A comprehensive backtesting engine for evaluating systematic trading strategies on historical market data. Built with Python, Flask, and React to provide professional-grade performance analytics and risk metrics.
 
+**🚀 Live Demo:** [https://frontend-n4ds85evz-joyce-zhous-projects.vercel.app](https://frontend-n4ds85evz-joyce-zhous-projects.vercel.app)
+
+**📊 API:** [https://trading-backtest-platform.onrender.com](https://trading-backtest-platform.onrender.com)
+
 ## Features
 
 ### Trading Strategies
@@ -16,7 +20,7 @@ A comprehensive backtesting engine for evaluating systematic trading strategies 
 - **Trade Analytics**: Win rate, profit factor, average win/loss, trade count
 
 ### Technical Features
-- Real-time market data integration via Yahoo Finance API
+- Dynamic synthetic data generation for any ticker symbol
 - Intelligent data caching for fast backtests
 - RESTful API architecture
 - Interactive web dashboard with Chart.js visualizations
