@@ -79,7 +79,7 @@ class MeanReversionStrategy(BaseStrategy):
 
         signals['price'] = data['Close']
 
-        # Generate signals at band crosses
+        # Use loop for precise crossover detection (band touches are discrete events)
         for i in range(1, len(signals)):
             current_price = signals['price'].iloc[i]
             prev_price = signals['price'].iloc[i-1]
@@ -90,18 +90,16 @@ class MeanReversionStrategy(BaseStrategy):
             if pd.isna(lower) or pd.isna(upper):
                 continue
 
-            # Buy when price crosses below lower band
             if prev_price >= lower and current_price < lower:
                 signals.iloc[i, signals.columns.get_loc('signal')] = 1.0
 
-            # Sell when price crosses above upper band
             elif prev_price <= upper and current_price > upper:
                 signals.iloc[i, signals.columns.get_loc('signal')] = -1.0
 
             elif abs(current_price - middle) < signals['std'].iloc[i] * 0.5:
                 pass
 
-        # Track positions
+        # Maintain position state between signals
         signals['position_raw'] = 0.0
         position = 0.0
         for i in range(len(signals)):
@@ -117,6 +115,7 @@ class MeanReversionStrategy(BaseStrategy):
         """Convert signals to positions, shifted to avoid look-ahead bias."""
         positions = pd.DataFrame(index=signals.index)
         positions['position'] = signals['position_raw']
+        # Shift by 1: can't act on band touch until next period
         positions['position'] = positions['position'].shift(1).fillna(0)
         return positions
 

@@ -75,14 +75,14 @@ class MovingAverageStrategy(BaseStrategy):
             min_periods=self.parameters['slow_window']
         ).mean()
 
-        # Create position indicator: 1 when fast > slow, 0 otherwise
+        # Use np.where for vectorized comparison (faster than iterating)
         signals['position_raw'] = np.where(
             signals['fast_ma'] > signals['slow_ma'],
             1.0,
             0.0
         )
 
-        # Convert position changes to signals
+        # Use diff() to generate signals only at crossover points
         signals['signal'] = signals['position_raw'].diff()
         signals['signal'].iloc[0] = 0.0
 
@@ -92,6 +92,7 @@ class MovingAverageStrategy(BaseStrategy):
         """Convert signals to positions, shifted to avoid look-ahead bias."""
         positions = pd.DataFrame(index=signals.index)
         positions['position'] = signals['position_raw']
+        # Shift by 1 period: can't trade on today's close until tomorrow
         positions['position'] = positions['position'].shift(1).fillna(0)
         return positions
 

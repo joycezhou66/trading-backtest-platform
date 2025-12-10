@@ -73,6 +73,7 @@ class MomentumStrategy(BaseStrategy):
         gains = delta.where(delta > 0, 0.0)
         losses = -delta.where(delta < 0, 0.0)
 
+        # Use EWM for smoothing (Wilder's method)
         avg_gains = gains.ewm(span=window, adjust=False).mean()
         avg_losses = losses.ewm(span=window, adjust=False).mean()
 
@@ -102,7 +103,7 @@ class MomentumStrategy(BaseStrategy):
         oversold = self.parameters['oversold']
         overbought = self.parameters['overbought']
 
-        # Generate signals at threshold crossovers
+        # Signal on threshold crossovers (not continuous levels)
         for i in range(1, len(signals)):
             current_rsi = signals['rsi'].iloc[i]
             prev_rsi = signals['rsi'].iloc[i-1]
@@ -110,15 +111,13 @@ class MomentumStrategy(BaseStrategy):
             if pd.isna(current_rsi) or pd.isna(prev_rsi):
                 continue
 
-            # Buy when RSI crosses above oversold threshold
             if prev_rsi <= oversold and current_rsi > oversold:
                 signals.iloc[i, signals.columns.get_loc('signal')] = 1.0
 
-            # Sell when RSI crosses below overbought threshold
             elif prev_rsi >= overbought and current_rsi < overbought:
                 signals.iloc[i, signals.columns.get_loc('signal')] = -1.0
 
-        # Track positions
+        # Maintain position state between signals
         signals['position_raw'] = 0.0
         position = 0.0
         for i in range(len(signals)):
@@ -134,6 +133,7 @@ class MomentumStrategy(BaseStrategy):
         """Convert signals to positions, shifted to avoid look-ahead bias."""
         positions = pd.DataFrame(index=signals.index)
         positions['position'] = signals['position_raw']
+        # Shift by 1: can't act on RSI calculation until next period
         positions['position'] = positions['position'].shift(1).fillna(0)
         return positions
 
