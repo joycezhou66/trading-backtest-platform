@@ -1,20 +1,20 @@
-/* Strategy Selector Component Styling */
+/* Strategy Selector Component - Marshall Wace Style */
 
 .strategy-selector {
-  background: rgba(30, 41, 59, 0.6);
-  backdrop-filter: blur(10px);
-  border: 1px solid #334155;
-  border-radius: 12px;
+  background: #ffffff;
+  border: 1px solid #e5e5e5;
+  border-radius: 4px;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .strategy-selector h2 {
   margin: 0 0 1.5rem;
-  color: #e2e8f0;
+  color: #3C104D;
   font-size: 1.5rem;
-  font-weight: 600;
+  font-weight: 400;
+  font-family: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
 }
 
 .form-grid {
@@ -32,17 +32,17 @@
 .form-group label {
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #cbd5e1;
+  color: #333333;
   font-size: 0.9rem;
 }
 
 .form-group input,
 .form-group select {
   padding: 0.75rem;
-  border: 1px solid #475569;
-  border-radius: 6px;
-  background: rgba(15, 23, 42, 0.8);
-  color: #e2e8f0;
+  border: 1px solid #dedfe0;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #333333;
   font-size: 1rem;
   transition: all 0.2s;
 }
@@ -50,8 +50,8 @@
 .form-group input:focus,
 .form-group select:focus {
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  border-color: #3C104D;
+  box-shadow: 0 0 0 2px rgba(60, 16, 77, 0.1);
 }
 
 .form-group input:disabled,
@@ -63,7 +63,7 @@
 .form-group small {
   margin-top: 0.25rem;
   font-size: 0.8rem;
-  color: #64748b;
+  color: #666666;
 }
 
 /* Ticker Suggestions */
@@ -76,19 +76,19 @@
 
 .ticker-chip {
   padding: 0.4rem 0.8rem;
-  border: 1px solid #475569;
+  border: 1px solid #dedfe0;
   border-radius: 20px;
-  background: rgba(51, 65, 85, 0.6);
-  color: #94a3b8;
+  background: #f5f5f5;
+  color: #333333;
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .ticker-chip:hover:not(:disabled) {
-  background: rgba(59, 130, 246, 0.2);
-  border-color: #3b82f6;
-  color: #93c5fd;
+  background: #3C104D;
+  border-color: #3C104D;
+  color: #ffffff;
   transform: translateY(-1px);
 }
 
@@ -99,39 +99,37 @@
 
 /* Parameters Section */
 .parameters-section {
-  background: rgba(15, 23, 42, 0.4);
-  border-radius: 8px;
+  background: #fafafa;
+  border-radius: 4px;
   padding: 1.5rem;
   margin: 1.5rem 0;
+  border: 1px solid #e5e5e5;
 }
 
 .parameters-section h3 {
   margin: 0 0 1rem;
-  color: #cbd5e1;
+  color: #333333;
   font-size: 1.1rem;
   font-weight: 500;
 }
 
-/* Run Button */
+/* Run Button - Marshall Wace Green */
 .run-button {
   width: 100%;
-  padding: 1rem 2rem;
+  padding: calc(0.667em + 2px) calc(1.333em + 2px);
   margin-top: 1rem;
   border: none;
-  border-radius: 8px;
-  background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-  color: white;
-  font-size: 1.1rem;
-  font-weight: 600;
+  border-radius: 9999px;
+  background: #61a229;
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
-  transition: all 0.3s;
-  box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.3);
+  transition: background 0.2s;
 }
 
 .run-button:hover:not(:disabled) {
-  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
-  box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.4);
-  transform: translateY(-2px);
+  background: #4e8221;
 }
 
 .run-button:disabled {
