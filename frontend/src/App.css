@@ -6,7 +6,7 @@
 
 .app {
   min-height: 100vh;
-  background: #ffffff;
+  background: #f8f9fa;
   color: #333333;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
 }
@@ -15,24 +15,25 @@
   background: #ffffff;
   padding: 2.5rem 2rem;
   text-align: center;
-  border-bottom: 1px solid #e5e5e5;
+  border-bottom: 2px solid #3C104D;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 .app-header h1 {
   margin: 0;
-  font-size: 2.5rem;
-  font-weight: 400;
+  font-size: 2.25rem;
+  font-weight: 600;
   color: #3C104D;
-  font-family: 'Libre Baskerville', Georgia, 'Times New Roman', serif;
-  letter-spacing: -0.02em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+  letter-spacing: -0.03em;
 }
 
 .subtitle {
-  margin: 0.75rem 0 0;
-  font-size: 1rem;
+  margin: 0.5rem 0 0;
+  font-size: 0.95rem;
   color: #666666;
   font-weight: 400;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.02em;
 }
 
 .app-container {
