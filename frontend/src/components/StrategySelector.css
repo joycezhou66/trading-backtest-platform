@@ -117,9 +117,12 @@
 
 /* Run Button - Cohesive Purple */
 .run-button {
-  width: 100%;
-  padding: 0.875rem 2rem;
-  margin-top: 1rem;
+  display: block;
+  width: auto;
+  min-width: 200px;
+  max-width: 300px;
+  margin: 1.5rem auto 0;
+  padding: 0.875rem 3rem;
   border: none;
   border-radius: 4px;
   background: #3C104D;
